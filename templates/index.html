@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Xonani band qilish</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main>
+  <h1>Majlislar xonasini band qilish</h1>
+
+  {% for category, message in get_flashed_messages(with_categories=true) %}
+    <div class="flash {{ category }}">{{ message }}</div>
+  {% endfor %}
+
+  <nav class="day-nav">
+    <a href="{{ url_for('index', date=prev_day.isoformat()) }}" aria-label="Oldingi kun">‹</a>
+    <form method="get">
+      <input type="date" name="date" value="{{ day.isoformat() }}" onchange="this.form.submit()">
+    </form>
+    <a href="{{ url_for('index', date=next_day.isoformat()) }}" aria-label="Keyingi kun">›</a>
+    {% if day != today %}<a class="today" href="{{ url_for('index') }}">Bugun</a>{% endif %}
+  </nav>
+
+  <section class="schedule">
+    {% for room_id, room in rooms.items() %}
+      <article class="room">
+        <h2>{{ room.name }} <small>{{ room.capacity }} kishi</small></h2>
+
+        <div class="timeline" aria-hidden="true">
+          {% for h in hours %}
+            <span class="tick" style="left: {{ (h - hours.start) / (hours|length - 1) * 100 }}%">{{ h }}</span>
+          {% endfor %}
+          {% for b in schedule[room_id] %}
+            <span class="slot {% if b.id in mine %}mine{% endif %}"
+                  style="left: {{ b.left }}%; width: {{ b.width }}%"
+                  title="{{ b.start_time }}–{{ b.end_time }} {{ b.name }}"></span>
+          {% endfor %}
+        </div>
+
+        {% if schedule[room_id] %}
+          <ul class="bookings">
+            {% for b in schedule[room_id] %}
+              <li>
+                <span class="time">{{ b.start_time }}–{{ b.end_time }}</span>
+                <span class="who">{{ b.name }} · {{ b.people }} kishi</span>
+                {% if b.id in mine %}
+                  <form method="post" action="{{ url_for('cancel', booking_id=b.id) }}"
+                        onsubmit="return confirm('Bandni bekor qilasizmi?')">
+                    <button class="cancel">Bekor qilish</button>
+                  </form>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="empty">Bo'sh</p>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </section>
+
+  <section class="book">
+    <h2>Band qilish</h2>
+    <form method="post" action="{{ url_for('book') }}" id="book-form">
+      <label>Ismingiz
+        <input name="name" required maxlength="100" value="{{ form.name or '' }}">
+      </label>
+      <label>Xona
+        <select name="room_id" id="room" required>
+          {% for room_id, room in rooms.items() %}
+            <option value="{{ room_id }}" data-capacity="{{ room.capacity }}"
+                    {% if form.room_id == room_id|string %}selected{% endif %}>
+              {{ room.name }} ({{ room.capacity }} kishi)
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Odamlar soni
+        <input name="people" id="people" type="number" min="1" required value="{{ form.people or 1 }}">
+      </label>
+      <p class="warning" id="capacity-warning" hidden></p>
+      <label>Sana
+        <input name="date" type="date" required min="{{ today.isoformat() }}"
+               value="{{ form.date or day.isoformat() }}">
+      </label>
+      <div class="row">
+        <label>Boshlanish
+          <input name="start_time" type="time" min="09:00" max="18:00" step="300" required
+                 value="{{ form.start_time or '' }}">
+        </label>
+        <label>Tugash
+          <input name="end_time" type="time" min="09:00" max="18:00" step="300" required
+                 value="{{ form.end_time or '' }}">
+        </label>
+      </div>
+      <p class="hint">Ish vaqti: 09:00–18:00</p>
+      <button type="submit">Band qilish</button>
+    </form>
+  </section>
+</main>
+
+<script>
+  // Sig'imdan oshsa darhol ogohlantiramiz (server ham baribir tekshiradi)
+  const room = document.getElementById("room");
+  const people = document.getElementById("people");
+  const warning = document.getElementById("capacity-warning");
+  function checkCapacity() {
+    const opt = room.selectedOptions[0];
+    const cap = Number(opt.dataset.capacity);
+    const n = Number(people.value);
+    warning.hidden = !(n > cap);
+    warning.textContent = `Diqqat: bu xona ${cap} kishilik, siz ${n} kishi kiritdingiz.`;
+  }
+  room.addEventListener("change", checkCapacity);
+  people.addEventListener("input", checkCapacity);
+  checkCapacity();
+</script>
+</body>
+</html>
