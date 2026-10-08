@@ -7,7 +7,7 @@
 
 - Ishlab turgan ilova: https://nurullokh77.pythonanywhere.com
 - GitHub repozitoriy: https://github.com/dvlpr19/1-vazifa
-- AI chat tarixi (link yoki fayl nomi): `ai-chat-tarixi.md` (Claude Code sessiyasi, uchala vazifa bitta suhbatda)
+- AI chat tarixi (link yoki fayl nomi): https://github.com/dvlpr19/3-vazifalar/blob/main/ai-chat-tarixi.md (Claude Code sessiyasi, uchala vazifa bitta suhbatda)
 
 ## Qanday texnologiyalar ishlatdingiz va nega?
 
