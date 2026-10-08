@@ -5,8 +5,8 @@
 
 ## Linklar
 
-- Ishlab turgan ilova:
-- GitHub repozitoriy:
+- Ishlab turgan ilova: https://nurullokh77.pythonanywhere.com
+- GitHub repozitoriy: https://github.com/dvlpr19/1-vazifa
 - AI chat tarixi (link yoki fayl nomi):
 
 ## Qanday texnologiyalar ishlatdingiz va nega?

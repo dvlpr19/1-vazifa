@@ -73,7 +73,10 @@ PythonAnywhere'da fayllar saqlanib qoladi, shuning uchun u tanlandi.
 4. **Virtualenv:** `/home/<USERNAME>/xona-band/.venv`
 5. **WSGI configuration file** ni ochib, hammasini quyidagiga almashtiring:
    ```python
-   import os, sys
+   import os, sys, time
+   # Server UTC vaqtida ishlaydi — "bugun" Toshkent vaqti bo'yicha bo'lishi uchun
+   os.environ["TZ"] = "Asia/Tashkent"
+   time.tzset()
    path = "/home/<USERNAME>/xona-band"
    if path not in sys.path:
        sys.path.insert(0, path)
